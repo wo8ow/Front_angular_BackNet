@@ -1,0 +1,30 @@
+<h1>Lista de Alumnos</h1>
+<button class="btn btn-outline-primary" type="button" routerLink="/nuevoalumno">Nuevo Alumno</button>
+<div class=""> 
+    <table class="table tbale-responsive table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+           @for (alumno of listaalumnos(); track alumno.id ?? alumno.id ?? $index; let contador = $index) {
+            <tr>
+                <td>{{ (contador + 1) }}</td>
+                <td>{{ alumno.nombres }}</td>
+                <td>{{ alumno.direccion}}</td>
+                <td>{{ alumno.telefono}}</td>
+                <td>{{ alumno.email }}</td>
+                <td>
+                    <button class="btn btn-outline-warning" [routerLink]="['/editaralumno', alumno.id]">Editar</button>
+                    <button class="btn btn-outline-danger" >Eliminar</button>
+                </td>
+            </tr>
+           }
+        </tbody>
+    </table>
+</div>

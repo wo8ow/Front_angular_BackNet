@@ -1,0 +1,48 @@
+<h1>Lista de Clientes</h1>
+
+<button class="btn btn-outline-primary" type="button" routerLink="/nuevoCliente">Nuevo Cliente</button>
+
+<div class=""> 
+
+    <table class="table tbale-responsive table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+           @for (cliente of listaclientes(); track cliente.idcliente ?? cliente.id ?? $index; let contador = $index) {
+            <tr>
+                <td>{{ (contador + 1) }}</td>
+                <td>{{ cliente.nombres }}</td>
+                <td>{{ cliente.direccion}}</td>
+                <td>{{ cliente.telefono}}</td>
+                <td>{{ cliente.email }}</td>
+                <td>
+                    <button class="btn btn-outline-warning" [routerLink]="['/editarCliente',cliente.id]">Editar</button>
+                    <button class="btn btn-outline-danger" (click)="eliminar(cliente.id)">Eliminar</button>
+                </td>
+            </tr>
+           }
+        </tbody>
+       <!-- <tfoot>
+            <tr *ngfor="let cl of lislistaclientes; let i = $index">
+                <td>{{ (i + 1) }}</td>
+                <td>{{ cl.nombres }}</td>
+                 <td>{{ cl.direccion}}</td>
+                <td>{{ cl.telefono}}</td>
+                <td>{{ cl.email }}</td>
+                <td>
+                    <button class="btn btn-outline-warning" >Editar</button>
+                    <button class="btn btn-outline-danger">Eliminar</button>
+                </td>
+            </tr>
+        </tfoot>-->
+    </table>
+
+
+</div>

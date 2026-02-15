@@ -1,0 +1,52 @@
+
+<h1>{{ titulo ? "Actualizar Cliente" : "Nuevo Cliente" }}</h1>
+
+
+<form [formGroup]="frmCliente" novalidate (submit)="guardar()">
+
+<!-- id -->
+<div class="col-12 col-md-2">
+    <label for="id" class="form-label">Id</label>
+    <input id="id" type="number" class="form-control" formControlName="id" readonly />
+ 
+ 
+</div>
+ 
+<!-- Nombres -->
+<div class="col-12 col-md-10">
+    <label for="nombres" class="form-label">Nombres</label>
+    <input id="nombres" type="text" class="form-control" formControlName="nombres" />
+ 
+ 
+</div>
+ 
+<!-- Direccion -->
+<div class="col-12">
+    <label for="direccion" class="form-label">Dirección</label>
+    <input id="direccion" type="text" class="form-control" formControlName="direccion" />
+ 
+ 
+</div>
+ 
+<!-- Telefono -->
+<div class="col-12 col-md-6">
+    <label for="telefono" class="form-label">Teléfono</label>
+    <input id="telefono" type="text" class="form-control" formControlName="telefono" />
+ 
+ 
+</div>
+ 
+<!-- Email -->
+<div class="col-12 col-md-6">
+    <label for="email" class="form-label">Email</label>
+    <input id="email" type="email" class="form-control" formControlName="email" />
+ 
+ 
+</div>
+ 
+<div class="col-12 col-md-6">
+    <button type="submit" class="btn btn-success" [disabled]="!frmCliente.valid">Guardar </button>
+    <button class="btn btn-secondary" [routerLink]="['/cliente']">Cancelar</button>
+   
+  </div>
+ </form>
