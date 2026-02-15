@@ -52,7 +52,7 @@ export class NuevoCliente {
 guardar() {
     const datosCliente = this.frmCliente.getRawValue();
     const clienteModel = {
-      id: datosCliente ?? 0,
+      id: this.idcliente > 0 ? this.idcliente : 0,
       nombres: datosCliente.nombres.trim(),
       direccion: datosCliente.direccion.trim(),
       telefono: datosCliente.telefono.trim(),

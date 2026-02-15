@@ -11,14 +11,17 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
 
-var cs = builder.Configuration.GetConnectionString("Default");
+var cs = builder.Configuration.GetConnectionString("Default")
+         ?? "Server=localhost;Database=usuarios_s5;Trusted_Connection=True;TrustServerCertificate=True;";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySQL(cs));
+    options.UseSqlServer(cs));
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+builder.Services.AddEndpointsApiExplorer(); // Necesario para versiones nuevas
+builder.Services.AddSwaggerGen(); // Recomendado si usas OpenAPI
 
 var app = builder.Build();
 
@@ -31,11 +34,8 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    Console.WriteLine($"ENV: {app.Environment.EnvironmentName}");
-
-    
-    
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
