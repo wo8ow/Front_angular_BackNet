@@ -1,89 +1,85 @@
-import { Component } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Route, Router, RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ClienteService } from '../../services/cliente.service';
-
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-nuevo-cliente',
-  imports: [RouterLink, ReactiveFormsModule],
-  templateUrl: './nuevo-cliente.html',
-  styleUrl: './nuevo-cliente.css',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink], // Asegura estos imports
+  templateUrl: './nuevo-cliente.html'
 })
-export class NuevoCliente {
-
+export class NuevoCliente implements OnInit {
   titulo = false;
   idcliente = 0;
 
-  frmCliente: FormGroup = new FormGroup({
-    id: new FormControl<number | null>(null),
-    nombres: new FormControl('', [Validators.required, Validators.maxLength(100)]),
-    direccion: new FormControl('', [Validators.required, Validators.maxLength(100)]),
-    telefono: new FormControl('', [Validators.required, Validators.maxLength(100)]),
-    email: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.email]),
+  frmCliente = new FormGroup({
+    nombres: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    direccion: new FormControl('', [Validators.required]),
+    telefono: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email])
   });
-  constructor(private _clienteServicio:ClienteService, private rutas:Router, 
-    private parametros:ActivatedRoute){
 
-      this.parametros.paramMap.subscribe(
-        valores =>{
-          const id = Number(valores.get("id"));
-          if (id>0){
-            this.titulo = true
-            this._clienteServicio.uno(id).subscribe(
-              cliente =>{
-                this.idcliente = cliente.id
-                this.frmCliente.patchValue({
-                    id: cliente.id,
-                    nombres: cliente.nombres,
-                    direccion: cliente.direccion,
-                    telefono: cliente.telefono,
-                    email:cliente.email
-                })
-              }
-            );
+  constructor(
+    private _clienteServicio: ClienteService,
+    private rutas: Router,
+    private parametros: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    this.parametros.paramMap.subscribe((valores) => {
+      const id = Number(valores.get('id'));
+      if (id > 0) {
+        this.titulo = true;
+        this.idcliente = id;
+        this._clienteServicio.uno(id).subscribe({
+          next: (cliente) => this.frmCliente.patchValue(cliente),
+          error: (err) => {
+            alert('Error al cargar cliente: ' + err.message);
+            this.rutas.navigate(['/cliente']);
           }
-        }
-      )
-
+        });
+      }
+    });
   }
 
-
-guardar() {
-    const datosCliente = this.frmCliente.getRawValue();
-    const clienteModel = {
-      id: this.idcliente > 0 ? this.idcliente : 0,
-      nombres: datosCliente.nombres.trim(),
-      direccion: datosCliente.direccion.trim(),
-      telefono: datosCliente.telefono.trim(),
-      email: datosCliente.email.trim(),
-    };
-
-    console.log(datosCliente)
-    if(this.titulo == true){
-
-      
-
-      this._clienteServicio.editar(clienteModel).subscribe((response) => {
-        console.log(response)
-     if(response == null){
-          alert("Se guardo con exito")
-          this.rutas.navigate(["/cliente"])
-     }
-    });
-    }else{
-      this._clienteServicio.nuevoCliente(clienteModel).subscribe((response) => {
-          if(response.id > 0){
-                alert("Se guardo con exito")
-                this.rutas.navigate(["/cliente"])
-          }
-          });
+  guardar() {
+    // Doble validación de seguridad
+    if (this.frmCliente.invalid) {
+      this.frmCliente.markAllAsTouched(); // Muestra los errores rojos si el usuario forzó el clic
+      return;
     }
 
+    const datosCliente = this.frmCliente.getRawValue();
+    const clienteModel = {
+      id: this.idcliente,
+      nombres: datosCliente.nombres,
+      direccion: datosCliente.direccion,
+      telefono: datosCliente.telefono,
+      email: datosCliente.email
+    };
 
-    
+    const peticion = this.titulo 
+      ? this._clienteServicio.editar(clienteModel) 
+      : this._clienteServicio.nuevoCliente(clienteModel);
+
+    peticion.subscribe({
+      next: () => {
+        alert('Operación exitosa');
+        this.rutas.navigate(['/cliente']);
+      },
+      error: (err) => {
+        // MANEJO DE ERRORES SEGÚN RÚBRICA
+        console.error('Error Backend:', err);
+        if (err.status === 400) {
+          alert('Error de validación: Verifica los datos enviados.');
+        } else if (err.status === 500) {
+          alert('Error del servidor: Inténtalo más tarde.');
+        } else {
+          alert('Ocurrió un error inesperado.');
+        }
+      }
+    });
   }
-
-
-
 }

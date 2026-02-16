@@ -1,52 +1,54 @@
-
-<h1>{{ titulo ? "Actualizar Cliente" : "Nuevo Cliente" }}</h1>
-
-
-<form [formGroup]="frmCliente" novalidate (submit)="guardar()">
-
-<!-- id -->
-<div class="col-12 col-md-2">
-    <label for="id" class="form-label">Id</label>
-    <input id="id" type="number" class="form-control" formControlName="id" readonly />
- 
- 
-</div>
- 
-<!-- Nombres -->
-<div class="col-12 col-md-10">
-    <label for="nombres" class="form-label">Nombres</label>
-    <input id="nombres" type="text" class="form-control" formControlName="nombres" />
- 
- 
-</div>
- 
-<!-- Direccion -->
-<div class="col-12">
-    <label for="direccion" class="form-label">Dirección</label>
-    <input id="direccion" type="text" class="form-control" formControlName="direccion" />
- 
- 
-</div>
- 
-<!-- Telefono -->
-<div class="col-12 col-md-6">
-    <label for="telefono" class="form-label">Teléfono</label>
-    <input id="telefono" type="text" class="form-control" formControlName="telefono" />
- 
- 
-</div>
- 
-<!-- Email -->
-<div class="col-12 col-md-6">
-    <label for="email" class="form-label">Email</label>
-    <input id="email" type="email" class="form-control" formControlName="email" />
- 
- 
-</div>
- 
-<div class="col-12 col-md-6">
-    <button type="submit" class="btn btn-success" [disabled]="!frmCliente.valid">Guardar </button>
-    <button class="btn btn-secondary" [routerLink]="['/cliente']">Cancelar</button>
-   
+<div class="card">
+  <div class="card-header">
+    {{ titulo ? 'Editar Cliente' : 'Nuevo Cliente' }}
   </div>
- </form>
+  <div class="card-body">
+    <form [formGroup]="frmCliente" (ngSubmit)="guardar()">
+      
+      <div class="mb-3">
+        <label for="nombres" class="form-label">Nombres Completos</label>
+        <input type="text" class="form-control" formControlName="nombres"
+               [class.is-invalid]="frmCliente.get('nombres')?.invalid && frmCliente.get('nombres')?.touched">
+        <div class="invalid-feedback" *ngIf="frmCliente.get('nombres')?.errors?.['required']">
+          El nombre es obligatorio.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="direccion" class="form-label">Dirección</label>
+        <input type="text" class="form-control" formControlName="direccion"
+               [class.is-invalid]="frmCliente.get('direccion')?.invalid && frmCliente.get('direccion')?.touched">
+        <div class="invalid-feedback">La dirección es obligatoria.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono</label>
+        <input type="text" class="form-control" formControlName="telefono"
+               [class.is-invalid]="frmCliente.get('telefono')?.invalid && frmCliente.get('telefono')?.touched">
+        <div class="invalid-feedback">El teléfono es obligatorio.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo Electrónico</label>
+        <input type="email" class="form-control" formControlName="email"
+               [class.is-invalid]="frmCliente.get('email')?.invalid && frmCliente.get('email')?.touched">
+        <div class="invalid-feedback" *ngIf="frmCliente.get('email')?.errors?.['required']">
+          El correo es obligatorio.
+        </div>
+        <div class="invalid-feedback" *ngIf="frmCliente.get('email')?.errors?.['email']">
+          Ingresa un correo válido (ej: usuario@dominio.com).
+        </div>
+      </div>
+
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="frmCliente.invalid">
+          {{ titulo ? 'Actualizar' : 'Guardar' }}
+        </button>
+        <button type="button" class="btn btn-secondary" routerLink="/cliente">
+          Cancelar
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

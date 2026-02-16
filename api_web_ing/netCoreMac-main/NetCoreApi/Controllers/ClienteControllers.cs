@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetCoreApi.Data;
 using NetCoreApi.Models;
+using System.Linq.Expressions;
 
 namespace NetCoreApi.Controllers;
 
@@ -30,11 +31,38 @@ public class ClientesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ClienteModel>> Post(ClienteModel model)
+    public async Task<ActionResult<ClienteModel>> PostClienteModel(ClienteModel clienteModel)
     {
-        _context.Set<ClienteModel>().Add(model);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = model.id }, model);
+        try
+        {
+            // 1. Validación de datos
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // 2. FORZAR ID A CERO: Esto le dice a Entity Framework "Esto es nuevo, genera tú el ID"
+            // Es vital si la base de datos tiene la columna como IDENTITY (Auto-increment)
+            clienteModel.id = 0;
+
+            _context.Clientes.Add(clienteModel);
+
+            // 3. Intento de guardado
+            await _context.SaveChangesAsync();
+
+            return Ok (clienteModel);
+        }
+        catch (Exception ex)
+        {
+            // 4. CAPTURA DE ERROR: Si falla, devolvemos el detalle técnico
+            // Esto te permitirá ver en la consola del navegador qué pasó exactamente (ej: nombre de columna inválido)
+            return StatusCode(500, new
+            {
+                mensaje = "Error al guardar en base de datos",
+                error = ex.Message,
+                detalle = ex.InnerException?.Message
+            });
+        }
     }
 
     [HttpPut("{id:int}")]
